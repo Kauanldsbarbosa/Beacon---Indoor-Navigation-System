@@ -5,7 +5,6 @@ import 'package:beacon/models/room/room.dart';
 import 'package:beacon/services/bluetooth_service.dart';
 import 'package:flutter_blue_plus/flutter_blue_plus.dart';
 import 'package:isar/isar.dart';
-import 'package:permission_handler/permission_handler.dart';
 
 class BeaconRepository {
   final Isar isar;
@@ -23,10 +22,6 @@ class BeaconRepository {
   StreamSubscription? _scanSubscription;
   Timer? _saveTimer;
   Future<void> startBeaconScanning(Function onBatchChanged) async {
-    if (!await _handlerBluetoothPermissions()) {
-      throw Exception('Bluetooth permissions not granted');
-    }
-
     if (FlutterBluePlus.isScanningNow) return;
 
     _startAutoSaveTimer();
@@ -132,20 +127,6 @@ class BeaconRepository {
     final txPower = bytes[22];
 
     return Beacon(uuid: uuid, major: major, minor: minor, txPower: txPower);
-  }
-
-  Future<bool> _handlerBluetoothPermissions() async {
-    var statusScan = await Permission.bluetoothScan.status;
-    var statusConnect = await Permission.bluetoothConnect.status;
-    var statusLocation = await Permission.location.status;
-
-    if (statusScan.isDenied) await Permission.bluetoothScan.request();
-    if (statusConnect.isDenied) await Permission.bluetoothConnect.request();
-    if (statusLocation.isDenied) await Permission.location.request();
-
-    return await Permission.bluetoothScan.isGranted &&
-        await Permission.bluetoothConnect.isGranted &&
-        await Permission.location.isGranted;
   }
 
   bool _isBeacon(List<int> bytes) {
