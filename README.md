@@ -42,10 +42,6 @@ Beacon is an assistive technology application designed to solve the challenge of
 ### Installation Steps
 
 1. **Clone the repository**
-```bash
-git clone <repository-url>
-cd beacon
-```
 
 2. **Install dependencies**
 ```bash
